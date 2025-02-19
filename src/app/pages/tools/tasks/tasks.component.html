@@ -1,0 +1,79 @@
+<div class="container">
+  <div class="header">
+    <h1>Tasks</h1>
+    <button mat-raised-button color="primary" (click)="openNewTaskDialog()">
+      <mat-icon>add</mat-icon>
+      New Task
+    </button>
+  </div>
+
+  <mat-table [dataSource]="tasks" class="mat-elevation-z8">
+    <ng-container matColumnDef="subject">
+      <mat-header-cell *matHeaderCellDef>Subject</mat-header-cell>
+      <mat-cell *matCellDef="let task">{{ task.subject }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <mat-header-cell *matHeaderCellDef>Description</mat-header-cell>
+      <mat-cell *matCellDef="let task">{{ task.description }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="startTime">
+      <mat-header-cell *matHeaderCellDef>Start Time</mat-header-cell>
+      <mat-cell *matCellDef="let task">{{
+        task.starttime | date : "medium"
+      }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="endTime">
+      <mat-header-cell *matHeaderCellDef>End Time</mat-header-cell>
+      <mat-cell *matCellDef="let task">{{
+        task.endtime | date : "medium"
+      }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="assignedBy">
+      <mat-header-cell *matHeaderCellDef>Assigned By</mat-header-cell>
+      <mat-cell *matCellDef="let task">
+        {{ task.assignedbyuserid?.fname || "Unknown" }}
+        {{ task.assignedbyuserid?.lname || "Unknown" }}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="assignedTo">
+      <mat-header-cell *matHeaderCellDef>Assigned To</mat-header-cell>
+      <mat-cell *matCellDef="let task">
+        {{ task.assignedtouserid?.fname || "Unknown" }}
+        {{ task.assignedtouserid?.lname || "Unknown" }}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="cctouserid">
+      <mat-header-cell *matHeaderCellDef>CC To</mat-header-cell>
+      <mat-cell *matCellDef="let task">
+        {{ task.cctouserid?.fname || "Unknown" }}
+        {{ task.cctouserid?.lname || "Unknown" }}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <mat-header-cell *matHeaderCellDef>status</mat-header-cell>
+      <mat-cell *matCellDef="let task">{{ task.status }} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+      <mat-cell *matCellDef="let task">
+        <button mat-icon-button color="primary">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+</div>

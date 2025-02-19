@@ -1,0 +1,54 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav [mode]="'side'" [opened]="isLoggedIn" class="sidenav mat-elevation-z2">
+    <div class="sidebar-header">
+      <img src="https://via.placeholder.com/40" alt="Logo" class="logo" />
+      <h2>Admin Panel</h2>
+    </div>
+
+    <mat-nav-list>
+      <div *ngFor="let item of menuItems">
+        <!-- Items without children -->
+        <a mat-list-item
+           *ngIf="!item.children"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           class="menu-item">
+          <mat-icon class="menu-icon">{{item.icon}}</mat-icon>
+          <span class="menu-text">{{item.name}}</span>
+        </a>
+
+        <!-- Items with children -->
+        <mat-expansion-panel *ngIf="item.children" class="mat-elevation-z0">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="menu-item">
+              <mat-icon class="menu-icon">{{item.icon}}</mat-icon>
+              <span class="menu-text">{{item.name}}</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <a mat-list-item
+             *ngFor="let child of item.children"
+             [routerLink]="child.route"
+             routerLinkActive="active"
+             class="submenu-item">
+            <mat-icon class="menu-icon">{{child.icon}}</mat-icon>
+            <span class="menu-text">{{child.name}}</span>
+          </a>
+        </mat-expansion-panel>
+      </div>
+    </mat-nav-list>
+
+    <div class="sidebar-footer">
+      <button mat-button class="logout-button" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div class="content-container">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

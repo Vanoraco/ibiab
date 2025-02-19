@@ -1,0 +1,67 @@
+# Node dependencies
+node_modules/
+.npm
+.yarn-integrity
+.pnpm-debug.log
+
+# Angular build artifacts
+dist/
+.angular/
+.cache/
+.aot/
+*.ngsummary.json
+*.ngfactory.ts
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temp files
+*.tmp
+*.bak
+
+# Firebase
+.firebase/
+
+# Testing
+coverage/
+.nyc_output
+
+# Sass
+.sass-cache/
+
+# Misc
+*.pid
+*.seed
+*.pid.lock
+*.tsbuildinfo
+
+
+
+# Bolt-specific files
+.bolt

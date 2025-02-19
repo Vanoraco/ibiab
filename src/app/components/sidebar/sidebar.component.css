@@ -1,0 +1,146 @@
+.sidenav-container {
+  height: 100vh;
+  width: 100vw;
+  background-color: #f8f9fa;
+}
+
+.sidenav {
+  width: 260px;
+  background-color: #ffffff;
+  border-right: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  padding: 20px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.mat-expansion-panel {
+  box-shadow: none;
+  background: transparent;
+  margin: 0;
+}
+
+.mat-expansion-panel-header {
+  padding: 0 24px;
+  height: 48px;
+}
+
+.menu-icon {
+  margin-right: 16px;
+  color: #5f6368;
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+}
+
+.menu-text {
+  color: #3c4043;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.menu-item {
+  height: 48px;
+  margin: 4px 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  text-decoration: none;
+  color: #3c4043;
+  transition: background-color 0.3s;
+}
+
+.menu-item:hover {
+  background-color: #f1f3f4;
+}
+
+.submenu-item {
+  padding-left: 32px;
+  height: 40px;
+  margin: 4px 8px;
+  border-radius: 8px;
+}
+
+.active {
+  background-color: #e8f0fe !important;
+  color: #1a73e8 !important;
+}
+
+.active .menu-icon,
+.active .menu-text {
+  color: #1a73e8 !important;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+.logout-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  color: #5f6368;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.logout-button:hover {
+  background-color: #f1f3f4;
+}
+
+/* Expansion Panel Overrides */
+::ng-deep .mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+::ng-deep .mat-expansion-panel-header-title {
+  align-items: center;
+}
+
+/* List Item Hover Effect */
+.mat-list-item:hover {
+  background-color: #f1f3f4;
+}
+
+/* Make expansion panel background transparent */
+::ng-deep .mat-expansion-panel {
+  background: transparent !important;
+}
+
+/* Remove expansion panel margins and borders */
+::ng-deep .mat-expansion-panel:not([class*=mat-elevation-z]) {
+  box-shadow: none;
+}

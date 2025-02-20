@@ -4,6 +4,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../components/confirm-dialog/confirm-dialog.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -117,6 +118,42 @@ export class NotesComponent implements OnInit {
     }
   }
 
+  async deleteNote(noteId: string) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: {
+        title: 'Confirm Delete',
+        message: 'Are you sure you want to delete this note?'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result) {
+        try {
+          const { error } = await this.supabaseService.getSupabase()
+            .from('notes')
+            .delete()
+            .eq('id', noteId);
+
+          if (error) throw error;
+
+          this.notes = await this.NotesService.loadNotes() || [];
+          this.snackBar.open('Note deleted successfully', 'Dismiss', {
+            duration: 3000,
+            panelClass: 'success-toast'
+          });
+
+        } catch (error) {
+          console.error('Error deleting note:', error);
+          this.snackBar.open('Error deleting note: ' + (error instanceof Error ? error.message : 'Unknown error'), 'Close', {
+            duration: 5000,
+            panelClass: 'error-toast'
+          });
+        }
+      }
+    });
+  }
+
   openNewNoteDialog() {
     const dialogRef = this.dialog.open(NoteDialogComponent, {
       width: '500px'
@@ -157,7 +194,7 @@ export class NotesComponent implements OnInit {
     });
   }
 
-  private calculateTotalMinutes(start: Date, end: Date): number {
+  calculateTotalMinutes(start: Date, end: Date): number {
     if (!start || !end) return 0;
     const diff = new Date(end).getTime() - new Date(start).getTime();
     return Math.floor(diff / 1000 / 60);

@@ -4,6 +4,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../components/confirm-dialog/confirm-dialog.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -102,12 +103,44 @@ export class TasksComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    //await this.loadTasks();
-        this.tasks = await this.TasksService.loadTasks() || [];
-
+    this.tasks = await this.TasksService.loadTasks() || [];
   }
 
+  async deleteTask(taskId: string) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: {
+        title: 'Confirm Delete',
+        message: 'Are you sure you want to delete this task?'
+      }
+    });
 
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result) {
+        try {
+          const { error } = await this.supabaseService.getSupabase()
+            .from('tasks')
+            .delete()
+            .eq('id', taskId);
+
+          if (error) throw error;
+
+          this.tasks = await this.TasksService.loadTasks() || [];
+          this.snackBar.open('Task deleted successfully', 'Dismiss', {
+            duration: 3000,
+            panelClass: 'success-toast'
+          });
+
+        } catch (error) {
+          console.error('Error deleting task:', error);
+          this.snackBar.open('Error deleting task: ' + (error instanceof Error ? error.message : 'Unknown error'), 'Close', {
+            duration: 5000,
+            panelClass: 'error-toast'
+          });
+        }
+      }
+    });
+  }
 
   openNewTaskDialog() {
     const dialogRef = this.dialog.open(TaskDialogComponent, {

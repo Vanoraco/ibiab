@@ -144,3 +144,49 @@
 ::ng-deep .mat-expansion-panel:not([class*=mat-elevation-z]) {
   box-shadow: none;
 }
+
+@media screen and (max-width: 768px) {
+  .sidenav {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .content-container {
+    height: calc(100vh - 60px);
+  }
+
+  .sidebar-header {
+    padding: 12px;
+  }
+
+  .sidebar-header h2 {
+    font-size: 1rem;
+  }
+
+  .menu-item {
+    height: 40px;
+    margin: 2px 4px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .sidenav {
+    width: 100%;
+  }
+
+  .logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .menu-text {
+    font-size: 0.8rem;
+  }
+
+  .submenu-item {
+    padding-left: 24px;
+    height: 36px;
+  }
+}

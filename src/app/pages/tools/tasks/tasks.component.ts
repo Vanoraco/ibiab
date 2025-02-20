@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,11 +14,12 @@ import { SupabaseService } from '../../../services/supabase.service';
 import { TasksService } from '../../../services/tasks.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-task-dialog',
   template: `
-    <h2 mat-dialog-title>New Task</h2>
+    <h2 mat-dialog-title>{{data.task ? 'Edit Task' : 'New Task'}}</h2>
     <mat-dialog-content>
       <form #taskForm="ngForm">
         <mat-form-field appearance="fill" class="full-width">
@@ -98,8 +99,13 @@ export class TaskDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<TaskDialogComponent>,
-    private supabaseService: SupabaseService
-  ) {}
+    private supabaseService: SupabaseService,
+    @Inject(MAT_DIALOG_DATA) public data: { task?: any }
+  ) {
+    if (data?.task) {
+      this.task = { ...data.task };
+    }
+  }
 
   async ngOnInit() {
     try {
@@ -138,8 +144,49 @@ export class TaskDialogComponent implements OnInit {
   ]
 })
 export class TasksComponent implements OnInit {
-  displayedColumns: string[] = ['subject', 'description', 'startTime', 'endTime', 'assignedBy', 'assignedTo','cctouserid','status', 'actions'];
+  displayedColumns: string[] = ['subject', 'description', 'startTime', 'endTime', 'assignedBy', 'assignedTo', 'cctouserid', 'status', 'actions'];
   tasks: any[] = [];
+
+  editTask(task: any) {
+    const dialogRef = this.dialog.open(TaskDialogComponent, {
+      width: '500px',
+      data: { task }
+    });
+
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result) {
+        try {
+          const { error } = await this.supabaseService.getSupabase()
+            .from('tasks')
+            .update({
+              subject: result.subject,
+              description: result.description,
+              starttime: result.starttime,
+              endtime: result.endtime,
+              assignedtouserid: result.assignedtouserid,
+              cctouserid: result.cctouserid,
+              status: result.status
+            })
+            .eq('id', task.id);
+
+          if (error) throw error;
+          
+          await this.refreshTasks();
+          this.snackBar.open('Task updated successfully', 'Dismiss', {
+            duration: 3000,
+            panelClass: 'success-toast'
+          });
+
+        } catch (error) {
+          console.error('Error updating task:', error);
+          this.snackBar.open('Error updating task: ' + (error instanceof Error ? error.message : 'Unknown error'), 'Close', {
+            duration: 5000,
+            panelClass: 'error-toast'
+          });
+        }
+      }
+    });
+  }
 
   constructor(
     private supabaseService: SupabaseService,
@@ -251,6 +298,8 @@ export class TasksComponent implements OnInit {
     });
   }
 }
+
+
 
 
 

@@ -11,6 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../services/supabase.service';
 import { NotesService } from '../../../services/notes.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-note-dialog',
   template: `
@@ -100,17 +101,21 @@ export class NotesComponent implements OnInit {
   constructor(
     private supabaseService: SupabaseService,
     private NotesService: NotesService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
-
-
   async ngOnInit() {
-    //await this.loadNotes();
-  this.notes = await this.NotesService.loadNotes() || [];
-
+    try {
+      this.notes = await this.NotesService.loadNotes() || [];
+    } catch (error) {
+      console.error('Error loading notes:', error);
+      this.snackBar.open('Error loading notes', 'Close', {
+        duration: 5000,
+        panelClass: 'error-toast'
+      });
+    }
   }
-
 
   openNewNoteDialog() {
     const dialogRef = this.dialog.open(NoteDialogComponent, {
@@ -121,25 +126,32 @@ export class NotesComponent implements OnInit {
       if (result) {
         try {
           const session = this.supabaseService.currentSession();
-          if (!session?.user?.id) throw new Error('No user session');
+          if (!session?.user) throw new Error('No user session');
 
           const { error } = await this.supabaseService.getSupabase()
             .from('notes')
             .insert([{
-              ...result,
-              notefor: session.user.id,
-              enteredby_userid: session.user.id,
-               subject: result.subject,      // Ensure subject is defined
-               description: result.description, 
-               start_time: result.start_time,  // Ensure start time is defined
-              end_time: result.end_time,  
-              total_minutes: this.calculateTotalMinutes(result.start_time, result.end_time)
+              subject: result.subject,
+              notefor: result.notefor,
+              description: result.description,
+              start_time: result.start_time,
+              end_time: result.end_time,
+              user_id: session.user.id
             }]);
 
           if (error) throw error;
-  this.notes = await this.NotesService.loadNotes() || [];
+          
+          this.snackBar.open('Note created successfully', 'Dismiss', {
+            duration: 3000,
+            panelClass: 'success-toast'
+          });
+
         } catch (error) {
           console.error('Error creating note:', error);
+          this.snackBar.open('Error creating note: ' + (error instanceof Error ? error.message : 'Unknown error'), 'Close', {
+            duration: 5000,
+            panelClass: 'error-toast'
+          });
         }
       }
     });

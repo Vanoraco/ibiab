@@ -11,6 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../services/supabase.service';
 import { TasksService } from '../../../services/tasks.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-task-dialog',
@@ -96,7 +97,8 @@ export class TasksComponent implements OnInit {
   constructor(
     private supabaseService: SupabaseService,
     private TasksService: TasksService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   async ngOnInit() {
@@ -114,38 +116,38 @@ export class TasksComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
-        
-
-
-
-
-
-
         try {
-  const session = this.supabaseService.currentSession();
-  if (!session?.user) throw new Error('No user session');
+          const session = this.supabaseService.currentSession();
+          if (!session?.user) throw new Error('No user session');
 
-  const { error } = await this.supabaseService.getSupabase()
-    .from('tasks')
-    .insert([{
-      assignedbyuserid: session.user.id,
-      assignedtouserid: session.user.id,
-      cctouserid: session.user.id,
-      subject: result.subject,      // Ensure subject is defined
-      description: result.description,  // Ensure description is defined
-      starttime: result.starttime,  // Ensure start time is defined
-      endtime: result.endtime,      // Ensure end time is defined
-      status: result.status         // Ensure status is defined
-    }]);
+          const { error } = await this.supabaseService.getSupabase()
+            .from('tasks')
+            .insert([{
+              assignedbyuserid: session.user.id,
+              assignedtouserid: session.user.id,
+              cctouserid: session.user.id,
+              subject: result.subject,
+              description: result.description,
+              starttime: result.starttime,
+              endtime: result.endtime,
+              status: result.status
+            }]);
 
-  if (error) throw error;
-  
-  this.tasks = await this.TasksService.loadTasks() || [];
+          if (error) throw error;
+          
+          this.tasks = await this.TasksService.loadTasks() || [];
+          this.snackBar.open('Task created successfully', 'Dismiss', {
+            duration: 3000,
+            panelClass: 'success-toast'
+          });
 
-} catch (error) {
-  console.error('Error creating task:', error);
-}
-
+        } catch (error) {
+          console.error('Error creating task:', error);
+          this.snackBar.open('Error creating task: ' + (error instanceof Error ? error.message : 'Unknown error'), 'Close', {
+            duration: 5000,
+            panelClass: 'error-toast'
+          });
+        }
       }
     });
   }

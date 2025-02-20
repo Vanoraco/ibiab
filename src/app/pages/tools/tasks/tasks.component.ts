@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../services/supabase.service';
 import { TasksService } from '../../../services/tasks.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-task-dialog',
@@ -43,6 +44,33 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
           <mat-datepicker #endPicker></mat-datepicker>
         </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Assigned To</mat-label>
+          <mat-select [(ngModel)]="task.assignedtouserid" name="assignedTo" required>
+            <mat-option *ngFor="let user of users" [value]="user.id">
+              {{user.fname}} {{user.lname}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>CC To</mat-label>
+          <mat-select [(ngModel)]="task.cctouserid" name="ccTo" required>
+            <mat-option *ngFor="let user of users" [value]="user.id">
+              {{user.fname}} {{user.lname}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="task.status" name="status" required>
+            <mat-option value="pending">Pending</mat-option>
+            <mat-option value="in-progress">In Progress</mat-option>
+            <mat-option value="completed">Completed</mat-option>
+          </mat-select>
+        </mat-form-field>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
@@ -60,13 +88,31 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FormsModule
+    FormsModule,
+    MatSelectModule
   ]
 })
-export class TaskDialogComponent {
+export class TaskDialogComponent implements OnInit {
   task: any = {};
+  users: any[] = [];
 
-  constructor(public dialogRef: MatDialogRef<TaskDialogComponent>) {}
+  constructor(
+    public dialogRef: MatDialogRef<TaskDialogComponent>,
+    private supabaseService: SupabaseService
+  ) {}
+
+  async ngOnInit() {
+    try {
+      const { data, error } = await this.supabaseService.getSupabase()
+        .from('users')
+        .select('id, fname, lname');
+
+      if (error) throw error;
+      this.users = data || [];
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  }
 
   save() {
     this.dialogRef.close(this.task);
@@ -177,8 +223,8 @@ export class TasksComponent implements OnInit {
             .from('tasks')
             .insert([{
               assignedbyuserid: session.user.id,
-              assignedtouserid: session.user.id,
-              cctouserid: session.user.id,
+              assignedtouserid: result.assignedtouserid,
+              cctouserid: result.cctouserid,
               subject: result.subject,
               description: result.description,
               starttime: result.starttime,
@@ -205,4 +251,7 @@ export class TasksComponent implements OnInit {
     });
   }
 }
+
+
+
 

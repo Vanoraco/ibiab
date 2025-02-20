@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,60 +7,100 @@ import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angu
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { ChangeDetectorRef, Inject } from '@angular/core';
 import { of } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user-dialog',
-  template: `
-    <h2 mat-dialog-title>New User</h2>
-    <mat-dialog-content>
-      <form #userForm="ngForm">
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>First Name</mat-label>
-          <input matInput [(ngModel)]="user.fname" name="fname" required>
-        </mat-form-field>
+  // Update template with validation messages
+template: `
+<h2 mat-dialog-title>New User</h2>
+<mat-dialog-content>
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+  <form #userForm="ngForm">
+    <!-- First Name -->
+    <mat-form-field class="full-width">
+      <mat-label>First Name</mat-label>
+      <input matInput [(ngModel)]="user.fname" name="fname" required #fname="ngModel">
+      <mat-error *ngIf="fname.invalid && (fname.dirty || fname.touched)">
+        First name is required
+      </mat-error>
+    </mat-form-field>
 
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Last Name</mat-label>
-          <input matInput [(ngModel)]="user.lname" name="lname" required>
-        </mat-form-field>
+    <!-- Last Name -->
+    <mat-form-field class="full-width">
+      <mat-label>Last Name</mat-label>
+      <input matInput [(ngModel)]="user.lname" name="lname" required #lname="ngModel">
+      <mat-error *ngIf="lname.invalid && (lname.dirty || lname.touched)">
+        Last name is required
+      </mat-error>
+    </mat-form-field>
 
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput [(ngModel)]="user.email" name="email" type="email" required>
-        </mat-form-field>
+    <!-- Email -->
+    <mat-form-field class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="user.email" name="email" 
+             type="email" required email #email="ngModel">
+      <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
+        <div *ngIf="email.errors?.['required']">Email is required</div>
+        <div *ngIf="email.errors?.['email']">Invalid email format</div>
+      </mat-error>
+    </mat-form-field>
 
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Password</mat-label>
-          <input matInput [(ngModel)]="user.password" name="password" type="password" required>
-        </mat-form-field>
+    <!-- Password -->
+    <mat-form-field class="full-width">
+      <mat-label>Password</mat-label>
+      <input matInput [(ngModel)]="user.password" name="password" 
+             type="password" required minlength="8" #password="ngModel">
+      <mat-error *ngIf="password.invalid && (password.dirty || password.touched)">
+        <div *ngIf="password.errors?.['required']">Password is required</div>
+        <div *ngIf="password.errors?.['minlength']">
+          Password must be at least 8 characters
+        </div>
+      </mat-error>
+    </mat-form-field>
 
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Phone</mat-label>
-          <input matInput [(ngModel)]="user.phone" name="phone">
-        </mat-form-field>
+    <!-- Phone -->
+    <mat-form-field class="full-width">
+      <mat-label>Phone</mat-label>
+      <input matInput [(ngModel)]="user.phone" name="phone" 
+             pattern="[0-9]{10}" #phone="ngModel">
+      <mat-error *ngIf="phone.invalid && (phone.dirty || phone.touched)">
+        Valid 10-digit phone number required
+      </mat-error>
+    </mat-form-field>
 
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Branch</mat-label>
-          <mat-select [(ngModel)]="user.branch_id" name="branch_id" required>
-            <mat-option *ngFor="let branch of branches" [value]="branch.branch_id">
-              {{branch.name}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </form>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-raised-button color="primary" [disabled]="!userForm.form.valid" (click)="save()">Save</button>
-    </mat-dialog-actions>
-  `,
+    <!-- Branch -->
+    <mat-form-field class="full-width">
+      <mat-label>Branch</mat-label>
+      <mat-select [(ngModel)]="user.branch_id" name="branch_id" required #branch="ngModel">
+        <mat-option *ngFor="let branch of branches" [value]="branch.branch_id">
+          {{branch.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="branch.invalid && (branch.dirty || branch.touched)">
+        Branch selection is required
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" 
+          [disabled]="!userForm.valid" 
+          (click)="save()">
+    Save
+  </button>
+</mat-dialog-actions>
+`,
   styles: ['.full-width { width: 100%; margin-bottom: 15px; }'],
   standalone: true,
   imports: [
@@ -77,11 +117,15 @@ export class UserDialogComponent implements OnInit {
   roleId!: string; 
   user: any = {};
   branches: any[] = [];
+  errorMessage: string | null = null;
+
+  @ViewChild('userForm') userForm!: NgForm;
 
   constructor(
     public dialogRef: MatDialogRef<UserDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { roleId: string },
-    private supabaseService: SupabaseService
+    private supabaseService: SupabaseService,
+    private snackBar: MatSnackBar
   ) {
     this.roleId = data.roleId;
   }
@@ -96,6 +140,13 @@ export class UserDialogComponent implements OnInit {
 
   async save() {
     try {
+      this.errorMessage = null;
+      
+      if (!this.userForm.valid) {
+        this.userForm.form.markAllAsTouched();
+        return;
+      }
+
       // Create auth user first
       const { data: authUser, error: authError } = 
         await this.supabaseService.getSupabase().auth.signUp({
@@ -125,8 +176,18 @@ export class UserDialogComponent implements OnInit {
   
       this.dialogRef.close(data[0]);
       
+      this.snackBar.open('User added successfully', 'Dismiss', {
+        duration: 3000,
+        panelClass: 'success-toast'
+      });
+      
     } catch (error) {
       console.error('Error saving user:', error);
+      this.errorMessage = error instanceof Error ? error.message : 'Failed to create user';
+      this.snackBar.open('Error saving user: ' + this.errorMessage, 'Close', {
+        duration: 5000,
+        panelClass: 'error-toast'
+      });
     }
   }
 }
@@ -159,7 +220,8 @@ export class RoleUsersComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private supabaseService: SupabaseService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private snackBar: MatSnackBar
   ) {
     this.cdr.detach();
     setInterval(() => this.cdr.detectChanges(), 100);
@@ -203,20 +265,23 @@ export class RoleUsersComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ... existing code ...
-openNewUserDialog() {
-  const dialogRef = this.dialog.open(UserDialogComponent, {
-    width: '500px',
-    data: { roleId: this.roleId }
-  });
+  openNewUserDialog() {
+    const dialogRef = this.dialog.open(UserDialogComponent, {
+      width: '500px',
+      data: { roleId: this.roleId }
+    });
 
-  dialogRef.afterClosed().subscribe(newUser => {
-    if (newUser) {
-      this.users = [...this.users, newUser];
-      this.cdr.detectChanges();
-    }
-  });
-}
+    dialogRef.afterClosed().subscribe(newUser => {
+      if (newUser) {
+        this.users = [...this.users, newUser];
+        this.cdr.detectChanges();
+        this.snackBar.open('User added successfully', 'Dismiss', {
+          duration: 3000,
+          panelClass: 'success-toast'
+        });
+      }
+    });
+  }
 
   private async loadUsers() {
     await this.loadUsersForRole(this.roleId);
@@ -267,5 +332,12 @@ openNewUserDialog() {
   private isValidUUID(uuid: string): boolean {
     const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidPattern.test(uuid);
+  }
+
+  private showError(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: 'error-toast'
+    });
   }
 }

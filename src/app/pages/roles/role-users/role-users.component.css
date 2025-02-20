@@ -29,3 +29,97 @@
 button[mat-icon-button] {
   margin: 0 4px;
 }
+
+/* For form field errors */
+mat-error {
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.2;
+  height: 16px; /* Fixed height for consistent spacing */
+  display: block;
+}
+
+mat-form-field {
+  margin-bottom: 8px;
+}
+
+/* Error message container adjustments */
+.mat-mdc-form-field-error-wrapper {
+  padding-top: 0;
+  position: relative;
+  top: -2px;
+}
+
+/* Specific adjustment for email/password error containers */
+/* Target error containers with multiple messages */
+/* Specific fix for multi-line error fields */
+/* Unified error container styling */
+.mat-mdc-form-field-subscript-wrapper {
+  height: 20px !important;
+  margin-top: -8px !important;
+}
+
+/* Error message formatting */
+mat-error {
+  line-height: 1.2;
+  font-size: 12px;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Specific fix for multi-error fields */
+mat-error div {
+  display: block;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+}
+
+mat-form-field {
+  margin-top: 0 !important;
+  margin-bottom: 8px !important;
+}
+
+.mat-mdc-form-field-error-wrapper {
+  padding-top: 0 !important;
+  margin-top: -5px !important;
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  height: auto !important;
+  margin-top: -10px !important;
+  padding-top: 0 !important;
+}
+
+.success-toast {
+  background: #43a047;
+  color: white;
+}
+
+.error-toast {
+  background: #d32f2f;
+  color: white;
+}
+
+/* Position adjustments */
+.mat-mdc-form-field-error-wrapper {
+  padding: 0 !important;
+  position: relative;
+  top: -4px;
+}
+
+.mat-mdc-form-field-error-wrapper {
+  padding: 0 !important;
+  position: relative;
+  top: -4px;
+}
+/* For the general error message */
+.error-message {
+  margin: 10px 0;  /* Reduced vertical spacing */
+  padding: 8px;
+}
+
+/* Adjust form field spacing */
+mat-form-field {
+  margin-bottom: 8px;  /* Reduced from 15px */
+}

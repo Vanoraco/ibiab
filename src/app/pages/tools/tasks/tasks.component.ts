@@ -107,6 +107,14 @@ export class TasksComponent implements OnInit {
   }
 
   async deleteTask(taskId: string) {
+    if (!taskId) {
+      this.snackBar.open('Invalid task ID', 'Close', {
+        duration: 5000,
+        panelClass: 'error-toast'
+      });
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px',
       data: {
@@ -125,7 +133,8 @@ export class TasksComponent implements OnInit {
 
           if (error) throw error;
 
-          this.tasks = await this.TasksService.loadTasks() || [];
+          // Refresh the tasks list
+          await this.refreshTasks();
           this.snackBar.open('Task deleted successfully', 'Dismiss', {
             duration: 3000,
             panelClass: 'success-toast'
@@ -142,6 +151,17 @@ export class TasksComponent implements OnInit {
     });
   }
 
+  private async refreshTasks() {
+    try {
+      this.tasks = await this.TasksService.loadTasks() || [];
+    } catch (error) {
+      console.error('Error refreshing tasks:', error);
+      this.snackBar.open('Error refreshing tasks', 'Close', {
+        duration: 5000,
+        panelClass: 'error-toast'
+      });
+    }
+  }
   openNewTaskDialog() {
     const dialogRef = this.dialog.open(TaskDialogComponent, {
       width: '500px'
@@ -185,3 +205,4 @@ export class TasksComponent implements OnInit {
     });
   }
 }
+

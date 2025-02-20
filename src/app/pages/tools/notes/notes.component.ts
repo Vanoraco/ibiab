@@ -119,6 +119,14 @@ export class NotesComponent implements OnInit {
   }
 
   async deleteNote(noteId: string) {
+    if (!noteId) {
+      this.snackBar.open('Invalid note ID', 'Close', {
+        duration: 5000,
+        panelClass: 'error-toast'
+      });
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px',
       data: {
@@ -137,7 +145,8 @@ export class NotesComponent implements OnInit {
 
           if (error) throw error;
 
-          this.notes = await this.NotesService.loadNotes() || [];
+          // Refresh the notes list
+          await this.refreshNotes();
           this.snackBar.open('Note deleted successfully', 'Dismiss', {
             duration: 3000,
             panelClass: 'success-toast'
@@ -154,6 +163,17 @@ export class NotesComponent implements OnInit {
     });
   }
 
+  private async refreshNotes() {
+    try {
+      this.notes = await this.NotesService.loadNotes() || [];
+    } catch (error) {
+      console.error('Error refreshing notes:', error);
+      this.snackBar.open('Error refreshing notes', 'Close', {
+        duration: 5000,
+        panelClass: 'error-toast'
+      });
+    }
+  }
   openNewNoteDialog() {
     const dialogRef = this.dialog.open(NoteDialogComponent, {
       width: '500px'
@@ -200,3 +220,4 @@ export class NotesComponent implements OnInit {
     return Math.floor(diff / 1000 / 60);
   }
 }
+

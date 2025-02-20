@@ -7,22 +7,22 @@ import { SupabaseService } from './supabase.service';
 export class TasksService {
   constructor(private supabaseService: SupabaseService) {}
 
-
-     async loadTasks() {
+    async loadTasks() {
     const { data, error } = await this.supabaseService
     .getSupabase()
     .from('tasks')
     .select(`
-subject,
-description,
-starttime,
-endtime,
-status,
-   assignedbyuserid (fname, lname),
+      id,
+      subject,
+      description,
+      starttime,
+      endtime,
+      status,
+      assignedbyuserid (fname, lname),
       assignedtouserid (fname, lname),
-            cctouserid (fname, lname)
-
-    `);
+      cctouserid (fname, lname)
+    `)
+    .order('starttime', { ascending: false });
   
     if (error) {
       console.error('Error fetching tasks:', error.message);
@@ -43,4 +43,5 @@ status,
   }));
   }
   }
+
 

@@ -37,6 +37,14 @@ export class CalendarComponent implements OnInit {
   }
 
   async deleteEvent(eventId: string) {
+    if (!eventId) {
+      this.snackBar.open('Invalid event ID', 'Close', {
+        duration: 5000,
+        panelClass: 'error-toast'
+      });
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px',
       data: {
@@ -55,11 +63,13 @@ export class CalendarComponent implements OnInit {
 
           if (error) throw error;
 
+          // Refresh the events list
           this.events = await this.EventsService.loadevents() || [];
           this.snackBar.open('Event deleted successfully', 'Dismiss', {
             duration: 3000,
             panelClass: 'success-toast'
           });
+
         } catch (error) {
           console.error('Error deleting event:', error);
           this.snackBar.open('Error deleting event: ' + (error instanceof Error ? error.message : 'Unknown error'), 'Close', {

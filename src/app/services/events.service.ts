@@ -7,13 +7,12 @@ import { SupabaseService } from './supabase.service';
 export class EventsService {
   constructor(private supabaseService: SupabaseService) {}
 
-
-
   async loadevents() {
     const { data, error } = await this.supabaseService
     .getSupabase()
     .from('events')
     .select(`
+      id,
       date, 
       time, 
       note, 

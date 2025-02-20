@@ -13,12 +13,13 @@ async loadNotes() {
     .getSupabase()
     .from('notes')
     .select(`
-   subject,   
+      id,
+      subject,   
       start_time, 
       end_time, 
       total_minutes,
       description,
-   notefor(fname, lname),
+      notefor(fname, lname),
       enteredby_userid (fname, lname)`);
   
     if (error) {
@@ -34,10 +35,7 @@ async loadNotes() {
     return data.map((task: any) => ({
       ...task,
       notefor: task.notefor ? `${task.notefor.fname} ${task.notefor.lname}` : 'Unknown',
-    enteredbyuserid: task.enteredbyuserid ? `${task.enteredbyuserid.fname} ${task.enteredbyuserid.lname}` : 'Unknown'
-
-
-  }));
-}
-  
+      enteredbyuserid: task.enteredbyuserid ? `${task.enteredbyuserid.fname} ${task.enteredbyuserid.lname}` : 'Unknown'
+    }));
+  }
 }
